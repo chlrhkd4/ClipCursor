@@ -5,7 +5,7 @@ Useful for games in multi-monitor setups especially with games using edge scroll
 
 ## Download
 
-Download the latest version [here](https://github.com/DeadlySurprise/ClipCursor/releases).
+Download the latest version [here](https://github.com/chlrhkd4/ClipCursor/releases).
 
 ## Usage
 
