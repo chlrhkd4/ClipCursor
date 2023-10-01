@@ -10,6 +10,18 @@
     using System.Threading;
     using System.Linq;
 
+    public struct GUITHREADINFO
+    {
+        public int cbSize;
+        public int flags;
+        public int hwndActive;
+        public int hwndFocus;
+        public int hwndCapture;
+        public int hwndMenuOwner;
+        public int hwndMoveSize;
+        public int hwndCaret;
+    }
+
     /// <summary>
     /// Contains methods for constraining the cursor to a window as well as a command-line tool for this task.
     /// </summary>
@@ -110,19 +122,26 @@
                     previousStyles = GetWindowLong(windowHandle, GetWindowLongIndex.GWL_STYLE);
                 }
 
-                if (GetForegroundWindow() == windowHandle)
-                {
-                    if (GetWindowRect(windowHandle, ref windowArea) == 0)
-                    {
-                        throw new Win32Exception(
-                            Marshal.GetLastWin32Error(),
-                            string.Format("Get window rectangle win32 error. selectedWindowHandle {0:d}", windowHandle));
-                    }
+                POINT pt;
+                GetCursorPos(out pt);
 
-                    windowArea.Left += windowBorderSize.Left;
-                    windowArea.Top += windowBorderSize.Top;
-                    windowArea.Bottom -= windowBorderSize.Bottom;
-                    windowArea.Right -= windowBorderSize.Right;
+                if (GetWindowRect(windowHandle, ref windowArea) == 0)
+                {
+                    throw new Win32Exception(
+                        Marshal.GetLastWin32Error(),
+                        string.Format("Get window rectangle win32 error. selectedWindowHandle {0:d}", windowHandle));
+                }
+
+                windowArea.Left += windowBorderSize.Left;
+                windowArea.Top += windowBorderSize.Top;
+                windowArea.Bottom -= windowBorderSize.Bottom;
+                windowArea.Right -= windowBorderSize.Right + 1;
+
+                //Console.WriteLine("{0} {1}", pt.x, pt.y);
+                //Console.WriteLine("{0} {1} {2} {3}", windowArea.Left, windowArea.Right, windowArea.Bottom, windowArea.Top);
+
+                if (GetForegroundWindow() == windowHandle && (pt.x >= windowArea.Left && pt.x <= windowArea.Right && pt.y <= windowArea.Bottom && pt.y >= windowArea.Top))
+                {
 
                     if (ClipCursor(ref windowArea) == 0)
                     {
@@ -191,7 +210,7 @@
                     Console.WriteLine($"{process.ProcessName}: {process.MainWindowHandle}|{process.MainWindowTitle}");
                 }
 
-                if (!string.IsNullOrEmpty(process.MainWindowTitle))
+                if (!string.IsNullOrEmpty(process.MainWindowTitle) && process.MainWindowTitle.Contains("Gersang"))
                 {
                     if (outputWindowNames)
                     {
@@ -298,6 +317,10 @@
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLong")]
         private static extern WindowStyles GetWindowLong(IntPtr hwnd, GetWindowLongIndex index);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetCursorPos")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
         #endregion
 
         /// <summary>
@@ -319,5 +342,12 @@
                 return string.Format("Left : {0:d}, Top : {1:d}, Right : {2:d}, Bottom : {3:d}", Left, Top, Right, Bottom);
             }
         }
+
+        public struct POINT
+        {
+            public Int32 x;
+            public Int32 y;
+        }
+
     }
 }
