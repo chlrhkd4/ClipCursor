@@ -106,6 +106,7 @@
         public static void LockCursor(IntPtr windowHandle)
         {
             Rectangle windowArea = new Rectangle();
+            Rectangle windowArea_original = new Rectangle();
             bool selectedWindowHadFocus = false;
             int validateHandleCount = 0;
             WindowStyles previousStyles = 0;
@@ -132,15 +133,27 @@
                         string.Format("Get window rectangle win32 error. selectedWindowHandle {0:d}", windowHandle));
                 }
 
+                int borderGap = 2;
                 windowArea.Left += windowBorderSize.Left;
                 windowArea.Top += windowBorderSize.Top;
                 windowArea.Bottom -= windowBorderSize.Bottom;
-                windowArea.Right -= windowBorderSize.Right + 1;
+                windowArea.Right -= windowBorderSize.Right;
+
+                windowArea_original.Left = windowArea.Left;
+                windowArea_original.Top = windowArea.Top;
+                windowArea_original.Bottom = windowArea.Bottom;
+                windowArea_original.Right = windowArea.Right;
+
+                windowArea.Left += borderGap;
+                windowArea.Top += borderGap;
+                windowArea.Bottom -= borderGap;
+                windowArea.Right -= borderGap;
+
 
                 //Console.WriteLine("{0} {1}", pt.x, pt.y);
                 //Console.WriteLine("{0} {1} {2} {3}", windowArea.Left, windowArea.Right, windowArea.Bottom, windowArea.Top);
 
-                if (GetForegroundWindow() == windowHandle && (pt.x >= windowArea.Left && pt.x <= windowArea.Right && pt.y <= windowArea.Bottom && pt.y >= windowArea.Top))
+                if (GetForegroundWindow() == windowHandle && (windowArea_original.IsPointInRectangle(pt)))
                 {
 
                     if (ClipCursor(ref windowArea) == 0)
@@ -151,7 +164,7 @@
                     }
 
                     selectedWindowHadFocus = true;
-                    Thread.Sleep(500);
+                    // Thread.Sleep(500);
                 }
                 else if (selectedWindowHadFocus)
                 {
@@ -210,7 +223,7 @@
                     Console.WriteLine($"{process.ProcessName}: {process.MainWindowHandle}|{process.MainWindowTitle}");
                 }
 
-                if (!string.IsNullOrEmpty(process.MainWindowTitle) && process.MainWindowTitle.Contains("Gersang"))
+                if (!string.IsNullOrEmpty(process.MainWindowTitle) && process.ProcessName.Contains("Gersang"))
                 {
                     if (outputWindowNames)
                     {
@@ -340,6 +353,10 @@
             public override string ToString()
             {
                 return string.Format("Left : {0:d}, Top : {1:d}, Right : {2:d}, Bottom : {3:d}", Left, Top, Right, Bottom);
+            }
+
+            public bool IsPointInRectangle(in POINT pt) {
+                return pt.x >= Left && pt.x <= Right && pt.y <= Bottom && pt.y >= Top;
             }
         }
 
