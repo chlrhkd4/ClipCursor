@@ -1,25 +1,11 @@
-# ClipCursor
+# ClipCursor_CustomizedForGersang
 
 A tiny tool to restrict the cursor to a specific window. 
-Useful for games in multi-monitor setups especially with games using edge scroll.
+Customized for Gersang to resolve hidpi issue
 
 ## Download
 
 Download the latest version [here](https://github.com/chlrhkd4/ClipCursor/releases).
-
-## Usage
-
-1. Start your game in windowed or borderless windowed mode
-2. Start the ClipCursor.exe
-3. Find the name of the game window in the displayed list. If the game is not in the list try pressing enter to refresh the list.
-
-    ![Game List](https://i.imgur.com/bdUR6KE.png)
-
-4. Type the number in front of the games name into the ClipCursor Window (in this example Civ 5 is number 11)
-
-    ![Cursor locked](https://i.imgur.com/k6wAlJi.png)
-
-5. The program should show the `Lock cursor to "{Game}"` message. The mouse cursor should be locked to the game window whenever the window is selected.
 
 ## Requirements
 
